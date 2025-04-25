@@ -1659,6 +1659,9 @@
       <Filter>Sources\builtin</Filter>
     </ClCompile>
     <ClCompile Include="..\src\libs\tinyfiledialogs\tinyfiledialogs.c" />
+    <ClCompile Include="..\src\hardware\server.cpp">
+      <Filter>Sources\hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\aviwriter\avi.h">

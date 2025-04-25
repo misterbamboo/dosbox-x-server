@@ -342,6 +342,8 @@ extern bool showdbcs, use_save_file, noremark_save_state, force_load_state;
 extern unsigned int hostkeyalt, sendkeymap;
 extern const char* RunningProgram;
 Bitu CaptureState = 0;
+bool ServerCaptureInProcess = false;
+bool ServerCaptureWaitingRightThreadToStart = false;
 
 void OPL_SaveRawEvent(bool pressed), SetGameState_Run(int value), ResolvePath(std::string& in);
 
@@ -615,7 +617,19 @@ FILE * OpenCaptureFile(const char * type,const char * ext) {
 	}
 	close_directory( dir );
 	char file_name[CROSS_LEN];
-	sprintf(file_name,"%s%c%s%03d%s",capturedir.c_str(),CROSS_FILESPLIT,file_start,(int)last,ext);
+
+    if(ServerCaptureInProcess)
+    {
+        // when capturing from a server, use a fixed name
+        sprintf(file_name, "%s%c%s%03d%s", capturedir.c_str(), CROSS_FILESPLIT, "server", (int)0, ext);
+        ServerCaptureInProcess = false; // reset the flag when capture is done
+    }
+    else
+    {
+        // increment the file number when it's a normal capture
+	    sprintf(file_name,"%s%c%s%03d%s",capturedir.c_str(),CROSS_FILESPLIT,file_start,(int)last,ext);
+    }
+
 	/* Open the actual file */
 	FILE * handle=fopen(file_name,"wb");
 	if (handle) {
@@ -1617,6 +1631,19 @@ void CAPTURE_RawScreenShotEvent(bool pressed) {
 #endif
 }
 #endif
+
+void InitServerScreenCapture() {
+    ServerCaptureInProcess = true;
+    ServerCaptureWaitingRightThreadToStart = true;
+}
+
+void CheckIfServerScreenCaptureIsWaiting() {
+    if(ServerCaptureWaitingRightThreadToStart)
+    {
+        CAPTURE_ScreenShotEvent(true);
+        ServerCaptureWaitingRightThreadToStart = false;
+    }
+}
 
 MixerChannel * MIXER_FirstChannel(void);
 

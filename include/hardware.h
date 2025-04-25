@@ -19,6 +19,7 @@
 #pragma once
 
 #include <stdio.h> // for FILE*, for OpenCaptureFile()
+#include <config.h>
 
 class Section;
 enum OPL_Mode {
@@ -34,6 +35,10 @@ enum OPL_Mode {
 #define CAPTURE_NETWORK		0x80
 
 extern Bitu CaptureState;
+
+extern bool ServerCaptureInProcess;
+void InitServerScreenCapture();
+void CheckIfServerScreenCaptureIsWaiting();
 
 void OPL_Init(Section* sec,OPL_Mode oplmode);
 void OPL_ShutDown(Section* sec);

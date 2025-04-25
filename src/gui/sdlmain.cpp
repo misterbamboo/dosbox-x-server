@@ -5468,7 +5468,9 @@ bool gfx_in_mapper = false;
 #define DB_POLLSKIP 1
 #endif
 
+#include "hardware.h"
 void GFX_Events() {
+    CheckIfServerScreenCaptureIsWaiting();
     CheckMapperKeyboardLayout();
 #if defined(C_SDL2) /* SDL 2.x---------------------------------- */
     //Don't poll too often. This can be heavy on the OS, especially Macs.
@@ -7328,6 +7330,7 @@ void Init_PS2_Port_92h();
 void Init_A20_Gate();
 void HARDWARE_Init();
 void CAPTURE_Init();
+void SERVER_Init();
 void ROMBIOS_Init();
 void CALLBACK_Init();
 void Init_DMA();
@@ -9005,6 +9008,7 @@ int main(int argc, char* argv[]) SDL_MAIN_NOEXCEPT {
 
         RENDER_Init();
         CAPTURE_Init();
+        SERVER_Init();
         IO_Init();
         HARDWARE_Init();
         CPU_PreInit();

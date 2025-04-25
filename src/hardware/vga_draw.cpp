@@ -5642,6 +5642,7 @@ void WriteARawImage(rawscreenshot &rawimg,rawscreenshot &rawpal,const char *ext)
 	png_destroy_write_struct(&png_ptr, &info_ptr);
 	/*close file*/
 	fclose(fp);
+
 	if (show_recorded_filename && pathscr.size()) systemmessagebox("Recording completed",("Saved screenshot to the file:\n\n"+pathscr).c_str(),"ok", "info", 1);
 }
 #endif
@@ -5703,7 +5704,7 @@ static void VGA_VerticalTimer(Bitu /*val*/) {
 		VGA_RenderOnDemandComplete();
 
 	is_vga_rendering_on_demand = vga_render_on_demand;
-	if (CaptureState & CAPTURE_RAWIMAGE) {
+	if (CaptureState & CAPTURE_RAWIMAGE || ServerCaptureInProcess) {
 		if (!rawshot.capturing) {
 			if (VGA_DrawRawLine != NULL) {
 				AllocateRawImage();
@@ -5719,6 +5720,7 @@ static void VGA_VerticalTimer(Bitu /*val*/) {
 		else {
 			if (rawshot.render_y >= vga.draw.height) {
 				WriteRawImage();
+
 				CaptureState &= ~CAPTURE_RAWIMAGE;
 				LOG(LOG_VGAMISC,LOG_NORMAL)("Raw capture saved");
 				rawshot.capturing = false;
