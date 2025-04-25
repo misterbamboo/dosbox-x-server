@@ -1,6 +1,11 @@
 
 **Welcome to the DOSBox-X project homepage located on GitHub.**
 
+# DOSBox-X-SERVER
+This version of DOSBox-X run a internal network server that can receive external instructions from a client. This make possible to run a DOS application in a DOSBox-X instance and control it from a external client to gather screenshots, ram data and more.
+
+See more info at [Server README](README.server.md)
+
 ## Useful links
 - [DOSBox-X's website](https://dosbox-x.com) ([https://dosbox-x.com](https://dosbox-x.com) or [http://dosbox-x.software](http://dosbox-x.software))  
 - [DOSBox-X's Wiki page](https://dosbox-x.com/wiki)  
