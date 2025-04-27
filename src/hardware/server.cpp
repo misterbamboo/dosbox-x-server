@@ -2,50 +2,20 @@
 #include <ws2tcpip.h>
 #include <iostream>
 #include <thread>
-#include <chrono>
+#include <map>
 #include "hardware.h"
+#include "srvCmd/serverCmdHandler.cpp"
 
 #pragma comment(lib, "Ws2_32.lib")
 
-/*#include <assert.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <limits.h>
+const int BUFFER_SIZE = 1024;
 
-#include "bitmapinfoheader.h"
-#include "dosbox.h"
-// #include "control.h"
-#include "logging.h"
-#include "setup.h"
-#include "support.h"
-#include "mem.h"
-// #include "mapper.h"
-#include "pic.h"
-#include "vga.h"
-#include "mixer.h"
-// #include "render.h"
-// #include "cross.h"
-#include "wave_mmreg.h"
-
-#if (C_SSHOT) || (C_AVCODEC)
-#include <zlib.h>
-#include <png.h>
-#include "../libs/zmbv/zmbv.h"
-#endif
-
-#include "riff_wav_writer.h"
-#include "avi_writer.h"
-#include "rawint.h"
-
-#include <map>
-*/
-
-void StartServer(const char* port);
-void HandleClient(SOCKET clientSocket);
+void startServer(const char* port);
+void handleClient(SOCKET clientSocket);
 bool ExecuteCmd(std::string& cmd, SOCKET clientSocket, char  buffer[1024], int bytesReceived);
-bool HandleExitCmd(std::string& cmd);
-std::string FlushReceivedBytes(char  currentCmd[1024], int& currentCmdCursor, int bytesReceived, char  buffer[1024]);
+bool handleExitCmd(std::string& cmd);
+std::string flushReceivedBytes(char  currentCmd[1024], int& currentCmdCursor, int bytesReceived, char  buffer[1024]);
+std::map<std::string, std::string> commands;
 
 void SERVER_Init() {
     // Start the server in a separate thread with a restart mechanism
@@ -53,7 +23,7 @@ void SERVER_Init() {
         while(true) {
             try {
                 std::cout << "Starting server...\n";
-                StartServer("8182");
+                startServer("8182");
             }
             catch(const std::exception& e) {
                 std::cerr << "Server crashed with exception: " << e.what() << "\n";
@@ -74,7 +44,7 @@ void SERVER_Init() {
     std::cout << "Server is running in the background with auto-restart enabled.\n";
 }
 
-void StartServer(const char* port) {
+void startServer(const char* port) {
     WSADATA wsaData;
     SOCKET listenSocket = INVALID_SOCKET;
     struct addrinfo* result = nullptr, hints;
@@ -141,7 +111,7 @@ void StartServer(const char* port) {
 
         std::cout << "Client connected.\n";
 
-        HandleClient(clientSocket);
+        handleClient(clientSocket);
     }
 
     // Cleanup
@@ -149,9 +119,9 @@ void StartServer(const char* port) {
     WSACleanup();
 }
 
-void HandleClient(SOCKET clientSocket) {
-    char buffer[1024];
-    char currentCmd[1024];
+void handleClient(SOCKET clientSocket) {
+    char buffer[BUFFER_SIZE];
+    char currentCmd[BUFFER_SIZE];
     int currentCmdCursor = 0;
     int bytesReceived;
 
@@ -166,80 +136,55 @@ void HandleClient(SOCKET clientSocket) {
             break;
         }
 
-        // Null-terminate the received data
         buffer[bytesReceived] = '\0';
-        std::cout << "Received from client: " << buffer << "\n";
+        std::string cmd = flushReceivedBytes(currentCmd, currentCmdCursor, bytesReceived, buffer);
+        if(handleExitCmd(cmd)) {
+            break;
+        }
 
-        std::string cmd = FlushReceivedBytes(currentCmd, currentCmdCursor, bytesReceived, buffer);
-
-        bool exit = ExecuteCmd(cmd, clientSocket, buffer, bytesReceived);
-        if(exit) break;
+        std::string result = executeServerCmd(cmd);
+        if(!result.empty()) {
+            std::string sendResult = result + "\n";
+            if(send(clientSocket, result.c_str(), result.size(), 0) == SOCKET_ERROR) {
+                std::cerr << "Error sending data to client.\n";
+                break;
+            }
+        }
     }
 
-    // Cleanup
     closesocket(clientSocket);
     std::cout << "Client handler terminated.\n";
 }
 
-bool ExecuteCmd(std::string& cmd, SOCKET clientSocket, char  buffer[1024], int bytesReceived)
-{
-    std::string result = "";
-    if(!cmd.empty()) {
-        std::cout << "Executing command: " << cmd << "\n";
-        if(HandleExitCmd(cmd))
-        {
-            return true; // exit the connexion
-        }
-        else if(cmd == "capture")
-        {
-            InitServerScreenCapture();
-            while(ServerCaptureInProcess)
-            {
-                // wait for the capture to finish
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            }
-            result = "Capture command executed.\n";
-        }
-        else
-        {
-            std::cout << "Unknown command: " << cmd << "\n";
-        }
-
-        // Echo the data back to the client
-        if(send(clientSocket, result.c_str(), result.size(), 0) == SOCKET_ERROR) {
-            std::cerr << "Error sending data to client.\n";
-            return true; // exit the connexion
-        }
-    }
-
-    return false;
-}
-
-bool HandleExitCmd(std::string& cmd)
+bool handleExitCmd(std::string& cmd)
 {
     if(cmd == "exit") {
-        std::cout << "Client requested to exit.\n";
         return true;
     }
     return false;
 }
 
-std::string FlushReceivedBytes(char currentCmd[1024], int& currentCmdCursor, int bytesReceived, char  buffer[1024])
-{
+std::string flushReceivedBytes(char currentCmd[], int& currentCmdCursor, int bytesReceived, char buffer[]) {
     // transfer received data to currentCmd
     // then the character ";" is received, the currentCmd is executed
     // then the rest of the buffer is appended to currentCmd for the next command
     currentCmd[currentCmdCursor] = '\0';
     for(int i = 0; i < bytesReceived; ++i) {
-        if(buffer[i] == '\n') {
+        if(buffer[i] == '\r') {
+            continue; // Ignore cariage return (Windows)
+        }
+        else if(buffer[i] == '\n') {
             currentCmd[currentCmdCursor] = '\0';
-            return currentCmd;
-            // Execute the command here (e.g., send it to the emulator)
             currentCmdCursor = 0; // Reset for the next command
+            return currentCmd;
         }
         else {
-            if(currentCmdCursor < sizeof(currentCmd) - 1) {
+            if(currentCmdCursor < BUFFER_SIZE - 1) {
                 currentCmd[currentCmdCursor++] = buffer[i];
+            }
+            else {
+                currentCmd[currentCmdCursor] = '\0';
+                return currentCmd;
             }
         }
     }

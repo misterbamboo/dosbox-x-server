@@ -1603,6 +1603,9 @@ for /d %%i in ("$(SolutionDir)\..\contrib\translations\*") do copy "%%i\*.lng" "
     <ClCompile Include="..\src\libs\fluidsynth\fluid_ringbuffer.c" />
     <ClCompile Include="..\src\libs\fluidsynth\fluid_settings.c" />
     <ClCompile Include="..\src\libs\fluidsynth\fluid_sys.c" />
+    <ClCompile Include="..\src\srvCmd\cmds\CaptureCmd.cpp" />
+    <ClCompile Include="..\src\srvCmd\cmds\MemoryReadCmd.cpp" />
+    <ClCompile Include="..\src\srvCmd\serverCmdHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\winres.rc" />

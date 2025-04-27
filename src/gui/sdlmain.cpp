@@ -5470,7 +5470,7 @@ bool gfx_in_mapper = false;
 
 #include "hardware.h"
 void GFX_Events() {
-    CheckIfServerScreenCaptureIsWaiting();
+    checkIfServerScreenCaptureIsWaiting();
     CheckMapperKeyboardLayout();
 #if defined(C_SDL2) /* SDL 2.x---------------------------------- */
     //Don't poll too often. This can be heavy on the OS, especially Macs.

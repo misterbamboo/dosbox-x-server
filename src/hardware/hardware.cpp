@@ -1632,12 +1632,12 @@ void CAPTURE_RawScreenShotEvent(bool pressed) {
 }
 #endif
 
-void InitServerScreenCapture() {
+void initServerScreenCapture() {
     ServerCaptureInProcess = true;
     ServerCaptureWaitingRightThreadToStart = true;
 }
 
-void CheckIfServerScreenCaptureIsWaiting() {
+void checkIfServerScreenCaptureIsWaiting() {
     if(ServerCaptureWaitingRightThreadToStart)
     {
         CAPTURE_ScreenShotEvent(true);

@@ -37,8 +37,8 @@ enum OPL_Mode {
 extern Bitu CaptureState;
 
 extern bool ServerCaptureInProcess;
-void InitServerScreenCapture();
-void CheckIfServerScreenCaptureIsWaiting();
+void initServerScreenCapture();
+void checkIfServerScreenCaptureIsWaiting();
 
 void OPL_Init(Section* sec,OPL_Mode oplmode);
 void OPL_ShutDown(Section* sec);
