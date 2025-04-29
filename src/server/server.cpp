@@ -4,7 +4,7 @@
 #include <thread>
 #include <map>
 #include "hardware.h"
-#include "srvCmd/serverCmdHandler.cpp"
+#include "server/handler/serverCmdHandler.cpp"
 
 #pragma comment(lib, "Ws2_32.lib")
 

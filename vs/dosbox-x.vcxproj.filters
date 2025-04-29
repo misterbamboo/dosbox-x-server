@@ -1668,17 +1668,17 @@
       <Filter>Sources\builtin</Filter>
     </ClCompile>
     <ClCompile Include="..\src\libs\tinyfiledialogs\tinyfiledialogs.c" />
-    <ClCompile Include="..\src\srvCmd\cmds\MemoryReadCmd.cpp">
-      <Filter>Sources\server\cmds</Filter>
+    <ClCompile Include="..\src\server\server.cpp">
+      <Filter>Sources\server</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\srvCmd\cmds\CaptureCmd.cpp">
-      <Filter>Sources\server\cmds</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\srvCmd\serverCmdHandler.cpp">
+    <ClCompile Include="..\src\server\handler\serverCmdHandler.cpp">
       <Filter>Sources\server\handler</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\hardware\server.cpp">
-      <Filter>Sources\server</Filter>
+    <ClCompile Include="..\src\server\cmds\CaptureCmd.cpp">
+      <Filter>Sources\server\cmds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\server\cmds\MemoryReadCmd.cpp">
+      <Filter>Sources\server\cmds</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

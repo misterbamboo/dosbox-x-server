@@ -1199,7 +1199,6 @@ for /d %%i in ("$(SolutionDir)\..\contrib\translations\*") do copy "%%i\*.lng" "
     <ClCompile Include="..\src\hardware\pc98_artic.cpp" />
     <ClCompile Include="..\src\hardware\pc98_fm.cpp" />
     <ClCompile Include="..\src\hardware\serialport\serialfile.cpp" />
-    <ClCompile Include="..\src\hardware\server.cpp" />
     <ClCompile Include="..\src\hardware\snd_pc98\cbus\board26k.c" />
     <ClCompile Include="..\src\hardware\snd_pc98\cbus\board86.c" />
     <ClCompile Include="..\src\hardware\snd_pc98\cbus\pcm86io.c" />
@@ -1562,6 +1561,10 @@ for /d %%i in ("$(SolutionDir)\..\contrib\translations\*") do copy "%%i\*.lng" "
     <ClCompile Include="..\src\output\output_tools.cpp" />
     <ClCompile Include="..\src\output\output_tools_xbrz.cpp" />
     <ClCompile Include="..\src\output\output_ttf.cpp" />
+    <ClCompile Include="..\src\server\cmds\CaptureCmd.cpp" />
+    <ClCompile Include="..\src\server\cmds\MemoryReadCmd.cpp" />
+    <ClCompile Include="..\src\server\handler\serverCmdHandler.cpp" />
+    <ClCompile Include="..\src\server\server.cpp" />
     <ClCompile Include="..\src\shell\shell.cpp" />
     <ClCompile Include="..\src\shell\shell_batch.cpp" />
     <ClCompile Include="..\src\shell\shell_cmds.cpp" />
@@ -1603,9 +1606,6 @@ for /d %%i in ("$(SolutionDir)\..\contrib\translations\*") do copy "%%i\*.lng" "
     <ClCompile Include="..\src\libs\fluidsynth\fluid_ringbuffer.c" />
     <ClCompile Include="..\src\libs\fluidsynth\fluid_settings.c" />
     <ClCompile Include="..\src\libs\fluidsynth\fluid_sys.c" />
-    <ClCompile Include="..\src\srvCmd\cmds\CaptureCmd.cpp" />
-    <ClCompile Include="..\src\srvCmd\cmds\MemoryReadCmd.cpp" />
-    <ClCompile Include="..\src\srvCmd\serverCmdHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\winres.rc" />

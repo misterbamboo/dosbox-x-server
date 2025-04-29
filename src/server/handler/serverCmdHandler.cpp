@@ -1,6 +1,6 @@
 #include <string>
-#include "cmds\CaptureCmd.cpp"
-#include "cmds\MemoryReadCmd.cpp"
+#include "..\cmds\CaptureCmd.cpp"
+#include "..\cmds\MemoryReadCmd.cpp"
 
 static std::string executeServerCmd(std::string& cmd) {
     if(cmd.empty()) {
