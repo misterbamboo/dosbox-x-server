@@ -127,6 +127,15 @@
     <Filter Include="Sources\hardware\RetroWaveLib">
       <UniqueIdentifier>{2a582629-0964-4559-9992-810e70c2f6ce}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\server">
+      <UniqueIdentifier>{5dab5491-5d59-4907-853f-2b8fc39db6aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\server\cmds">
+      <UniqueIdentifier>{0726adcd-6a9f-44c0-96b2-c6f5b7158632}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\server\handler">
+      <UniqueIdentifier>{d6a9fcc4-460d-4775-890e-3294d67c4a4e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\aviwriter\avi_rw_iobuf.cpp">
@@ -1659,8 +1668,17 @@
       <Filter>Sources\builtin</Filter>
     </ClCompile>
     <ClCompile Include="..\src\libs\tinyfiledialogs\tinyfiledialogs.c" />
+    <ClCompile Include="..\src\srvCmd\cmds\MemoryReadCmd.cpp">
+      <Filter>Sources\server\cmds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\srvCmd\cmds\CaptureCmd.cpp">
+      <Filter>Sources\server\cmds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\srvCmd\serverCmdHandler.cpp">
+      <Filter>Sources\server\handler</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\hardware\server.cpp">
-      <Filter>Sources\hardware</Filter>
+      <Filter>Sources\server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
