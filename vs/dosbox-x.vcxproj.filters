@@ -1680,6 +1680,9 @@
     <ClCompile Include="..\src\server\cmds\MemoryReadCmd.cpp">
       <Filter>Sources\server\cmds</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\server\cmds\MouseCmd.cpp">
+      <Filter>Sources\server\cmds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\aviwriter\avi.h">

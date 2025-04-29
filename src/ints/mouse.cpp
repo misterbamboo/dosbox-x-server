@@ -816,6 +816,13 @@ static bool AllowINT33RMAccess() {
 	return false;
 }
 
+
+void ServerMouse_SursorMoved(float xrel, float yrel, float x, float y) {
+    user_cursor_x = (int)(xrel);
+    user_cursor_y = (int)(yrel);
+    Mouse_CursorMoved(xrel, yrel, x, y, false);
+}
+
 /* FIXME: Re-test this code */
 void Mouse_CursorMoved(float xrel,float yrel,float x,float y,bool emulate) {
     extern bool Mouse_Vertical;

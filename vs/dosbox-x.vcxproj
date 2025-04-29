@@ -1563,6 +1563,7 @@ for /d %%i in ("$(SolutionDir)\..\contrib\translations\*") do copy "%%i\*.lng" "
     <ClCompile Include="..\src\output\output_ttf.cpp" />
     <ClCompile Include="..\src\server\cmds\CaptureCmd.cpp" />
     <ClCompile Include="..\src\server\cmds\MemoryReadCmd.cpp" />
+    <ClCompile Include="..\src\server\cmds\MouseCmd.cpp" />
     <ClCompile Include="..\src\server\handler\serverCmdHandler.cpp" />
     <ClCompile Include="..\src\server\server.cpp" />
     <ClCompile Include="..\src\shell\shell.cpp" />

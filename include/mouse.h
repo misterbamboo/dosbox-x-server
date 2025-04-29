@@ -33,7 +33,6 @@ bool Mouse_SetPS2State(bool use);
 
 void Mouse_ChangePS2Callback(uint16_t pseg, uint16_t pofs);
 
-
 void Mouse_CursorMoved(float xrel,float yrel,float x,float y,bool emulate);
 const char* Mouse_GetSelected(int x1, int y1, int x2, int y2, int w, int h, uint16_t *textlen);
 #if defined(WIN32) || defined(MACOSX) || defined(C_SDL2)
@@ -50,5 +49,7 @@ void Mouse_AfterNewVideoMode(bool setmode);
 
 void UpdateMouseReportRate(void);
 void ChangeMouseReportRate(unsigned int new_rate);
+
+void ServerMouse_SursorMoved(float x, float y, float xrel, float yrel);
 
 #endif

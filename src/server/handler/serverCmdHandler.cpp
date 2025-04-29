@@ -1,6 +1,7 @@
 #include <string>
-#include "..\cmds\CaptureCmd.cpp"
-#include "..\cmds\MemoryReadCmd.cpp"
+#include <server\cmds\CaptureCmd.cpp>
+#include <server\cmds\MemoryReadCmd.cpp>
+#include <server\cmds\MouseCmd.cpp>
 
 static std::string executeServerCmd(std::string& cmd) {
     if(cmd.empty()) {
@@ -10,9 +11,11 @@ static std::string executeServerCmd(std::string& cmd) {
     if(CaptureCmd::canHandle(cmd)) {
         return CaptureCmd::handle(cmd);
     }
-
-    if(MemoryReadCmd::canHandle(cmd)) {
+    else if(MemoryReadCmd::canHandle(cmd)) {
         return MemoryReadCmd::handle(cmd);
+    }
+    else if(MouseCmd::canHandle(cmd)) {
+        return MouseCmd::handle(cmd);
     }
 
     return "";
