@@ -1683,6 +1683,9 @@
     <ClCompile Include="..\src\server\cmds\MouseCmd.cpp">
       <Filter>Sources\server\cmds</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\server\cmds\SaveStateCmd.cpp">
+      <Filter>Sources\server\cmds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\aviwriter\avi.h">
@@ -2640,6 +2643,9 @@
     <ClInclude Include="..\include\version_string.h" />
     <ClInclude Include="..\src\hardware\esfmu\esfm.h" />
     <ClInclude Include="..\src\libs\tinyfiledialogs\tinyfiledialogs.h" />
+    <ClInclude Include="..\src\misc\include\savestates.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\winres.rc">

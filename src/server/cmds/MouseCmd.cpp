@@ -3,9 +3,9 @@
 
 class MouseCmd {
 public:
-    static constexpr const char* MOUVE_MOVE_CMD = "mouse_move,";
-    static constexpr const char* MOUVE_PRESS_CMD = "mouse_press,";
-    static constexpr const char* MOUVE_RELEASE_CMD = "mouse_release,";
+    static constexpr const char* MOUVE_MOVE_CMD = "mouse_move,"; // ...,x,y
+    static constexpr const char* MOUVE_PRESS_CMD = "mouse_press,"; // ...,button_num
+    static constexpr const char* MOUVE_RELEASE_CMD = "mouse_release,"; // ...,button_num
 
     static constexpr const double MAX_X = 640.0;
     static constexpr const double MAX_Y = 480.0;

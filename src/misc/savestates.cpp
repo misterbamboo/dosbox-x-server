@@ -15,6 +15,7 @@
 #include "control.h"
 #include "logging.h"
 #include "mixer.h"
+#include "savestates.h"
 #include "build_timestamp.h"
 #ifdef WIN32
 #include "direct.h"
@@ -184,7 +185,6 @@ namespace
 			notifyError(err);
 		}
 	}
-
 
 	void LoadGameState(bool pressed) {
 		if (!pressed) return;
@@ -593,7 +593,42 @@ bool loadstateconfirm(int ind) {
 	return ret;
 }
 
-void SaveState::load(size_t slot) const { //throw (Error)
+void SaveState::load(size_t slot) const {
+    SaveState::load(slot, true);
+}
+
+void SaveState::load(size_t slot, bool askForMemoryWarning) const {
+    std::string path;
+    bool Get_Custom_SaveDir(std::string & savedir);
+    if(Get_Custom_SaveDir(path)) {
+        path += CROSS_FILESPLIT;
+    }
+    else {
+        extern std::string capturedir;
+        const size_t last_slash_idx = capturedir.find_last_of("\\/");
+        if(std::string::npos != last_slash_idx) {
+            path = capturedir.substr(0, last_slash_idx);
+        }
+        else {
+            path = ".";
+        }
+        path += CROSS_FILESPLIT;
+        path += "save";
+        path += CROSS_FILESPLIT;
+    }
+
+    SaveState::load(slot, askForMemoryWarning, path);
+}
+
+void SaveState::load(size_t slot, bool askForMemoryWarning, std::string path) const {
+    std::string temp = path;
+    std::stringstream slotname;
+    slotname << slot + 1;
+    std::string save = use_save_file && savefilename.size() ? savefilename : temp + slotname.str() + ".sav";
+    SaveState::load(slot, askForMemoryWarning, path, save);
+}
+
+void SaveState::load(size_t slot, bool askForMemoryWarning, std::string path, std::string save) const {
 	//	if (isEmpty(slot)) return;
 	bool load_err=false;
 	if((MEM_TotalPages()*4096/1024/1024)>1024) {
@@ -607,28 +642,8 @@ void SaveState::load(size_t slot) const { //throw (Error)
         SDL_PauseAudio(0);
 #endif
 	extern const char* RunningProgram;
-	std::string path;
 	int err;
-	bool Get_Custom_SaveDir(std::string& savedir);
-	if(Get_Custom_SaveDir(path)) {
-		path+=CROSS_FILESPLIT;
-	} else {
-		extern std::string capturedir;
-		const size_t last_slash_idx = capturedir.find_last_of("\\/");
-		if (std::string::npos != last_slash_idx) {
-			path = capturedir.substr(0, last_slash_idx);
-		} else {
-			path = ".";
-		}
-		path += CROSS_FILESPLIT;
-		path +="save";
-		path += CROSS_FILESPLIT;
-	}
-	std::string temp;
-	temp = path;
-	std::stringstream slotname;
-	slotname << slot+1;
-	std::string save=use_save_file&&savefilename.size()?savefilename:temp+slotname.str()+".sav";
+	
 	std::ifstream check_slot;
 	check_slot.open(save.c_str(), std::ifstream::in);
 	if(check_slot.fail()) {
@@ -724,15 +739,17 @@ void SaveState::load(size_t slot) const { //throw (Error)
 
 		char str[10];
 		itoa((int)MEM_TotalPages(), str, 10);
-		if(!length||(size_t)length!=strlen(str)||strncmp(buffer,str,length)) {
-			if(!force_load_state&&!loadstateconfirm(2)) {
-				buffer[length]='\0';
-				int size=atoi(buffer)*4096/1024/1024;
-				LOG_MSG("Aborted. Check your memory size: %d MB", size);
-				load_err=true;
-				goto done;
-			}
-		}
+        if(askForMemoryWarning) {
+		    if(!length||(size_t)length!=strlen(str)||strncmp(buffer,str,length)) {
+			    if(!force_load_state&&!loadstateconfirm(2)) {
+				    buffer[length]='\0';
+				    int size=atoi(buffer)*4096/1024/1024;
+				    LOG_MSG("Aborted. Check your memory size: %d MB", size);
+				    load_err=true;
+				    goto done;
+			    }
+		    }
+        }
 
 		if ((err=zis.close()) != ZIP_OK) { load_err=true; goto done; }
 	}
@@ -926,4 +943,26 @@ std::string SaveState::getName(size_t slot, bool nl) const {
 	}
 
 	return ret;
+}
+
+bool loadStatePending = false;
+std::string loadStateParentPath = "";
+std::string loadStateSavePath = "";
+void setPendingLoadState(std::string parentPath, std::string savePath) {
+    loadStatePending = true;
+    loadStateParentPath = parentPath;
+    loadStateSavePath = savePath;
+}
+
+bool getPendingLoadState() {
+    return loadStatePending;
+}
+
+void checkIfLoadStatePending() {
+    if(loadStatePending) {
+        SaveState::instance().load(0, false, loadStateParentPath, loadStateSavePath);
+        loadStatePending = false;
+        loadStateParentPath = "";
+        loadStateSavePath = "";
+    }
 }

@@ -13,8 +13,7 @@ public:
         initServerScreenCapture();
         while(ServerCaptureInProcess)
         {
-            // wait for the capture to finish
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10)); // wait for the capture to finish
         }
         return "ok";
     }

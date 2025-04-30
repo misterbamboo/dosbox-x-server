@@ -449,7 +449,7 @@ for /d %%i in ("$(SolutionDir)\..\contrib\translations\*") do copy "%%i\*.lng" "
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)pcap;$(SolutionDir);$(SolutionDir)..;$(SolutionDir)..\include;$(SolutionDir)..\src;$(SolutionDir)..\src\aviwriter;$(SolutionDir)..\src\libs\mt32;$(SolutionDir)..\src\hardware\snd_pc98\cbus;$(SolutionDir)..\src\hardware\snd_pc98\common;$(SolutionDir)..\src\hardware\snd_pc98\generic;$(SolutionDir)..\src\hardware\snd_pc98\sound;$(SolutionDir)..\src\hardware\snd_pc98\x11;$(SolutionDir)..\src\hardware\snd_pc98\sound\getsnd;$(SolutionDir)libpdcurses;$(SolutionDir)zlib;$(SolutionDir)libpng;$(SolutionDir)freetype\include;$(SolutionDir)sdl\include;$(SolutionDir)sdlnet;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)pcap;$(SolutionDir);$(SolutionDir)..;$(SolutionDir)..\include;$(SolutionDir)..\src;$(SolutionDir)..\src\aviwriter;$(SolutionDir)..\src\libs\mt32;$(SolutionDir)..\src\hardware\snd_pc98\cbus;$(SolutionDir)..\src\hardware\snd_pc98\common;$(SolutionDir)..\src\hardware\snd_pc98\generic;$(SolutionDir)..\src\hardware\snd_pc98\sound;$(SolutionDir)..\src\hardware\snd_pc98\x11;$(SolutionDir)..\src\hardware\snd_pc98\sound\getsnd;$(SolutionDir)libpdcurses;$(SolutionDir)zlib;$(SolutionDir)libpng;$(SolutionDir)freetype\include;$(SolutionDir)sdl\include;$(SolutionDir)sdlnet;$(SolutionDir)..\src\misc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;__WIN32__;_CRT_SECURE_NO_WARNINGS;_FILE_OFFSET_BITS=64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>false</SDLCheck>
@@ -1564,6 +1564,7 @@ for /d %%i in ("$(SolutionDir)\..\contrib\translations\*") do copy "%%i\*.lng" "
     <ClCompile Include="..\src\server\cmds\CaptureCmd.cpp" />
     <ClCompile Include="..\src\server\cmds\MemoryReadCmd.cpp" />
     <ClCompile Include="..\src\server\cmds\MouseCmd.cpp" />
+    <ClCompile Include="..\src\server\cmds\SaveStateCmd.cpp" />
     <ClCompile Include="..\src\server\handler\serverCmdHandler.cpp" />
     <ClCompile Include="..\src\server\server.cpp" />
     <ClCompile Include="..\src\shell\shell.cpp" />
@@ -1920,6 +1921,7 @@ for /d %%i in ("$(SolutionDir)\..\contrib\translations\*") do copy "%%i\*.lng" "
     <ClInclude Include="..\src\libs\tinyfiledialogs\tinyfiledialogs.h" />
     <ClInclude Include="..\src\misc\ethernet_pcap.h" />
     <ClInclude Include="..\src\misc\ethernet_slirp.h" />
+    <ClInclude Include="..\src\misc\include\savestates.h" />
     <ClInclude Include="..\src\output\direct3d\d3d_components.h" />
     <ClInclude Include="..\src\output\direct3d\direct3d.h" />
     <ClInclude Include="..\src\output\direct3d\hq2x_d3d.h" />

@@ -1637,7 +1637,7 @@ void initServerScreenCapture() {
     ServerCaptureWaitingRightThreadToStart = true;
 }
 
-void checkIfServerScreenCaptureIsWaiting() {
+void checkIfServerScreenCapturePending() {
     if(ServerCaptureWaitingRightThreadToStart)
     {
         CAPTURE_ScreenShotEvent(true);

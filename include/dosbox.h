@@ -344,6 +344,10 @@ public:
 
     void save   (size_t slot);       //throw (Error)
     void load   (size_t slot) const; //throw (Error)
+    void load   (size_t slot, bool askForMemoryWarning) const;
+    void load   (size_t slot, bool askForMemoryWarning, std::string path) const;
+    void load   (size_t slot, bool askForMemoryWarning, std::string path, std::string save) const;
+
     bool isEmpty(size_t slot) const;
     void removeState(size_t slot) const;
     std::string getName(size_t slot, bool nl=false) const;

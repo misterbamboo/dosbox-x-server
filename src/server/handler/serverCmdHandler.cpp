@@ -2,6 +2,7 @@
 #include <server\cmds\CaptureCmd.cpp>
 #include <server\cmds\MemoryReadCmd.cpp>
 #include <server\cmds\MouseCmd.cpp>
+#include <server\cmds\SaveStateCmd.cpp>
 
 static std::string executeServerCmd(std::string& cmd) {
     if(cmd.empty()) {
@@ -16,6 +17,9 @@ static std::string executeServerCmd(std::string& cmd) {
     }
     else if(MouseCmd::canHandle(cmd)) {
         return MouseCmd::handle(cmd);
+    }
+    else if(SaveStateCmd::canHandle(cmd)) {
+        return SaveStateCmd::handle(cmd);
     }
 
     return "";
