@@ -685,13 +685,16 @@ void SaveState::load(size_t slot, bool askForMemoryWarning, std::string path, st
 		p=strrchr(buffer, '\n'); /* Remove i.e. "Linux" */
 		if (p!=NULL) *p=0;
 		std::string emulatorversion = std::string("DOSBox-X ") + VERSION + std::string(" (") + SDL_STRING + std::string(")");
-		if (strcasecmp(buffer,emulatorversion.c_str())) {
-			if(!force_load_state&&!loadstateconfirm(0)) {
-				LOG_MSG("Aborted. Check your DOSBox-X version: %s",buffer);
-				load_err=true;
-				goto done;
-			}
-		}
+
+        if(askForMemoryWarning) {
+		    if (strcasecmp(buffer,emulatorversion.c_str())) {
+			    if(!force_load_state&&!loadstateconfirm(0)) {
+				    LOG_MSG("Aborted. Check your DOSBox-X version: %s",buffer);
+				    load_err=true;
+				    goto done;
+			    }
+		    }
+        }
 
 		if ((err=zis.close()) != ZIP_OK) { load_err=true; goto done; }
 	}
@@ -705,25 +708,27 @@ void SaveState::load(size_t slot, bool askForMemoryWarning, std::string path, st
 		char buffer[4096];
 		size_t length = (size_t)zis.xsgetn((zip_istreambuf::char_type*)buffer,sizeof(buffer)-1); buffer[length] = 0;
 
-		if (!length||(size_t)length!=strlen(RunningProgram)||strncmp(buffer,RunningProgram,length)) {
-			if(!force_load_state&&!loadstateconfirm(1)) {
-				buffer[length]='\0';
-				LOG_MSG("Aborted. Check your program name: %s",buffer);
-				load_err=true;
-				goto done;
-			}
-			if (length<9) {
-				static char pname[9];
-				if (length) {
-					strncpy(pname,buffer,length);
-					pname[length]=0;
-				} else
-					strcpy(pname, "DOSBOX-X");
-				RunningProgram=pname;
-				void GFX_SetTitle(int32_t cycles, int frameskip, Bits timing, bool paused);
-				GFX_SetTitle(-1,-1,-1,false);
-			}
-		}
+        if(askForMemoryWarning) {
+		    if (!length||(size_t)length!=strlen(RunningProgram)||strncmp(buffer,RunningProgram,length)) {
+			    if(!force_load_state&&!loadstateconfirm(1)) {
+				    buffer[length]='\0';
+				    LOG_MSG("Aborted. Check your program name: %s",buffer);
+				    load_err=true;
+				    goto done;
+			    }
+			    if (length<9) {
+				    static char pname[9];
+				    if (length) {
+					    strncpy(pname,buffer,length);
+					    pname[length]=0;
+				    } else
+					    strcpy(pname, "DOSBOX-X");
+				    RunningProgram=pname;
+				    void GFX_SetTitle(int32_t cycles, int frameskip, Bits timing, bool paused);
+				    GFX_SetTitle(-1,-1,-1,false);
+			    }
+		    }
+        }
 
 		if ((err=zis.close()) != ZIP_OK) { load_err=true; goto done; }
 	}
@@ -765,13 +770,15 @@ void SaveState::load(size_t slot, bool askForMemoryWarning, std::string path, st
 
 		char str[20];
 		strcpy(str, getType().c_str());
-		if(!length||(size_t)length!=strlen(str)||strncmp(buffer,str,length)) {
-			if(!force_load_state&&!loadstateconfirm(3)) {
-				LOG_MSG("Aborted. Check your machine type: %s",buffer);
-				load_err=true;
-				goto done;
-			}
-		}
+        if(askForMemoryWarning) {
+		    if(!length||(size_t)length!=strlen(str)||strncmp(buffer,str,length)) {
+			    if(!force_load_state&&!loadstateconfirm(3)) {
+				    LOG_MSG("Aborted. Check your machine type: %s",buffer);
+				    load_err=true;
+				    goto done;
+			    }
+		    }
+        }
 
 		if ((err=zis.close()) != ZIP_OK) { load_err=true; goto done; }
 	}
