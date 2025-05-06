@@ -2,6 +2,7 @@
 #include <thread>
 #include <chrono>
 #include "mem.h"
+#include <server\result\ServerResult.h>
 
 class MemoryReadCmd {
 public:
@@ -16,21 +17,28 @@ public:
         return cmd.rfind(CMD_START, 0) == 0;
     }
 
-    static std::string handle(std::string cmd) {
+    static void handle(std::string cmd, ServerResult* serverResult) {
         std::string addrHexString = cmd.substr(std::string(READ_GENERAL).size());
         int addr = std::stoi(addrHexString, nullptr, 16);
 
         if(cmd.rfind(READ_BYTE, 0) == 0) {
-            return std::to_string(mem_readb(addr));
+            uint8_t val8bits = mem_readb(addr);
+            serverResult->setByte(val8bits);
+            return;
         }
         else if(cmd.rfind(READ_WORD, 0) == 0) {
-            return std::to_string(mem_readw(addr));
+            uint16_t val16bits = mem_readw(addr);
+            serverResult->setWord(val16bits);
+            return;
         }
         else if(cmd.rfind(READ_DWORD, 0) == 0) {
-            return std::to_string(mem_readd(addr));
+            uint32_t val32bits = mem_readd(addr);
+            serverResult->setDoubleWord(val32bits);
+            return;
         }
         else {
-            return "0";
+            serverResult->setFalse();
+            return;
         }
     }
 };

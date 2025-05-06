@@ -2,6 +2,7 @@
 #include <thread>
 #include <chrono>
 #include "hardware.h"
+#include <server\result\ServerResult.h>
 
 class CaptureCmd {
 public:
@@ -9,12 +10,12 @@ public:
         return cmd == "capture";
     }
 
-    static std::string handle(std::string cmd) {
+    static void handle(std::string cmd, ServerResult* serverResult) {
         initServerScreenCapture();
         while(ServerCaptureInProcess)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(10)); // wait for the capture to finish
         }
-        return "ok";
+        serverResult->setTrue();
     }
 };

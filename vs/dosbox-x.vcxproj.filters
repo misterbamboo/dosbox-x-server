@@ -136,6 +136,9 @@
     <Filter Include="Sources\server\handler">
       <UniqueIdentifier>{d6a9fcc4-460d-4775-890e-3294d67c4a4e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\server\result">
+      <UniqueIdentifier>{91797806-6d1e-44f6-b7ba-c51037a712e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\aviwriter\avi_rw_iobuf.cpp">
@@ -1685,6 +1688,12 @@
     </ClCompile>
     <ClCompile Include="..\src\server\cmds\SaveStateCmd.cpp">
       <Filter>Sources\server\cmds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\server\cmds\VgaReadCmd.cpp">
+      <Filter>Sources\server\cmds</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\server\result\ServerResult.h">
+      <Filter>Sources\server\result</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

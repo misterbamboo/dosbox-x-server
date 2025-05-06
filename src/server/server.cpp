@@ -5,6 +5,7 @@
 #include <map>
 #include "hardware.h"
 #include <server\handler\serverCmdHandler.cpp>
+#include <server\result\ServerResult.h>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -120,7 +121,8 @@ void startServer(const char* port) {
 }
 
 void handleClient(SOCKET clientSocket) {
-    char buffer[BUFFER_SIZE];
+    char receiveBuffer[BUFFER_SIZE];
+    ServerResult serverResult;
     char currentCmd[BUFFER_SIZE];
     int currentCmdCursor = 0;
     int bytesReceived;
@@ -130,26 +132,36 @@ void handleClient(SOCKET clientSocket) {
     // Client-server communication loop
     while(true) {
         // Receive data from the client
-        bytesReceived = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
+        bytesReceived = recv(clientSocket, receiveBuffer, sizeof(receiveBuffer) - 1, 0);
         if(bytesReceived == SOCKET_ERROR || bytesReceived == 0) {
             std::cerr << "Client disconnected or error occurred.\n";
             break;
         }
 
-        buffer[bytesReceived] = '\0';
-        std::string cmd = flushReceivedBytes(currentCmd, currentCmdCursor, bytesReceived, buffer);
+        receiveBuffer[bytesReceived] = '\0';
+        std::string cmd = flushReceivedBytes(currentCmd, currentCmdCursor, bytesReceived, receiveBuffer);
         if(handleExitCmd(cmd)) {
             break;
         }
 
-        std::string result = executeServerCmd(cmd);
-        if(!result.empty()) {
-            std::string sendResult = result + "\n";
-            if(send(clientSocket, result.c_str(), result.size(), 0) == SOCKET_ERROR) {
-                std::cerr << "Error sending data to client.\n";
-                break;
+        serverResult.length = 0;
+        int execCount = 0;
+        do
+        {
+            // result could be multi-part (> 1022 bytes means still have bytes to flush)
+            executeServerCmd(cmd, &serverResult);
+            execCount++;
+
+            if(!serverResult.length > 0) {
+                //std::string sendResult = result + "\n";
+                //send(clientSocket, result.c_str(), result.size(), 0) == SOCKET_ERROR
+                if(send(clientSocket, reinterpret_cast<const char*>(&serverResult), sizeof(ServerResult), 0) == SOCKET_ERROR) {
+                    std::cerr << "Error sending data to client.\n";
+                    break;
+                }
             }
-        }
+        } while(serverResult.length > 1022);
+
     }
 
     closesocket(clientSocket);

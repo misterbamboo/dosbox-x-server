@@ -3,6 +3,7 @@
 #include <chrono>
 #include "dosbox.h"
 #include "savestates.h"
+#include <server\result\ServerResult.h>
 
 class SaveStateCmd {
 public:
@@ -15,13 +16,14 @@ public:
         return false;
     }
 
-    static std::string handle(std::string cmd) {
+    static void handle(std::string cmd, ServerResult* serverResult) {
         if(cmd.rfind(LOAD_STATE_CMD, 0) == 0) {
             handlerLoadCmd(cmd);
-            return "1";
+            serverResult->setTrue();
+            return;
         }
 
-        return "0";
+        return serverResult->setFalse();
     }
 
     static void handlerLoadCmd(std::string cmd) {

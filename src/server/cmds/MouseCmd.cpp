@@ -1,5 +1,6 @@
 #include <string>
 #include "mouse.h"
+#include <server\result\ServerResult.h>
 
 class MouseCmd {
 public:
@@ -10,7 +11,7 @@ public:
     static constexpr const double MAX_X = 640.0;
     static constexpr const double MAX_Y = 480.0;
 
-    static bool canHandle(std::string cmd) {
+    static bool canHandle(std::string cmd, ServerResult* serverResult) {
         if(cmd.rfind(MOUVE_MOVE_CMD, 0) == 0) {
             return true;
         }
@@ -23,19 +24,24 @@ public:
         return false;
     }
 
-    static std::string handle(std::string cmd) {
+    static void handle(std::string cmd, ServerResult* serverResult) {
         if(cmd.rfind(MOUVE_MOVE_CMD, 0) == 0) {
             handlerMouseMoveCmd(cmd);
-            return "mouse_moved";
+            serverResult->setTrue();
+            return;
         }
         else if(cmd.rfind(MOUVE_PRESS_CMD, 0) == 0) {
             handlerMousePressedCmd(cmd);
-            return "mouse_pressed";
+            serverResult->setTrue();
+            return;
         }
         else if(cmd.rfind(MOUVE_RELEASE_CMD, 0) == 0) {
             handlerMouseReleasedCmd(cmd);
-            return "mouse_released";
+            serverResult->setTrue();
+            return;
         }
+
+        serverResult->setFalse();
     }
 
     static void handlerMouseMoveCmd(std::string cmd) {
