@@ -123,6 +123,7 @@ void startServer(const char* port) {
 void handleClient(SOCKET clientSocket) {
     char receiveBuffer[BUFFER_SIZE];
     ServerResult serverResult;
+    char sendBuffer[BUFFER_SIZE];
     char currentCmd[BUFFER_SIZE];
     int currentCmdCursor = 0;
     int bytesReceived;
@@ -149,13 +150,19 @@ void handleClient(SOCKET clientSocket) {
         do
         {
             // result could be multi-part (> 1022 bytes means still have bytes to flush)
-            executeServerCmd(cmd, &serverResult);
+            executeServerCmd(cmd, &serverResult, execCount);
             execCount++;
 
-            if(!serverResult.length > 0) {
+            if(serverResult.length > 0) {
                 //std::string sendResult = result + "\n";
                 //send(clientSocket, result.c_str(), result.size(), 0) == SOCKET_ERROR
-                if(send(clientSocket, reinterpret_cast<const char*>(&serverResult), sizeof(ServerResult), 0) == SOCKET_ERROR) {
+
+                uint16_t networkBigEndian = htons(serverResult.length);
+                std::memcpy(sendBuffer, &networkBigEndian, 2);
+                std::memcpy(sendBuffer + 2, serverResult.result, serverResult.length);
+
+                int sendSize = sizeof(serverResult.length) + serverResult.length;
+                if(send(clientSocket, sendBuffer, sendSize, 0) == SOCKET_ERROR) {
                     std::cerr << "Error sending data to client.\n";
                     break;
                 }
