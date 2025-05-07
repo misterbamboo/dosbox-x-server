@@ -3,10 +3,10 @@
 #include <server\cmds\MemoryReadCmd.cpp>
 #include <server\cmds\MouseCmd.cpp>
 #include <server\cmds\SaveStateCmd.cpp>
-#include <server\cmds\VgaReadCmd.cpp>
+#include <server\cmds\VgaReadCmd.h>
 #include <server\result\ServerResult.h>
 
-static void executeServerCmd(std::string cmd, ServerResult* serverResult, int execCount) {
+static void executeServerCmd(std::string cmd, ServerResult* serverResult) {
     serverResult->length = 0;
     if(cmd.empty()) {
         return;
@@ -17,7 +17,7 @@ static void executeServerCmd(std::string cmd, ServerResult* serverResult, int ex
         return;
     }
     else if(VgaReadCmd::canHandle(cmd)) {
-        VgaReadCmd::handle(cmd, serverResult, execCount);
+        VgaReadCmd::handle(cmd, serverResult);
         return;
     }
     else if(MemoryReadCmd::canHandle(cmd)) {

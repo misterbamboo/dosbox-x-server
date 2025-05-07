@@ -9,7 +9,7 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
-const int BUFFER_SIZE = 1024;
+const int BUFFER_SIZE = 8192; // 8kb
 
 void startServer(const char* port);
 void handleClient(SOCKET clientSocket);
@@ -146,29 +146,31 @@ void handleClient(SOCKET clientSocket) {
         }
 
         serverResult.length = 0;
-        int execCount = 0;
-        do
-        {
-            // result could be multi-part (> 1022 bytes means still have bytes to flush)
-            executeServerCmd(cmd, &serverResult, execCount);
-            execCount++;
+        executeServerCmd(cmd, &serverResult);
 
-            if(serverResult.length > 0) {
-                //std::string sendResult = result + "\n";
-                //send(clientSocket, result.c_str(), result.size(), 0) == SOCKET_ERROR
+        if(serverResult.length > 0) {
+            //std::string sendResult = result + "\n";
+            //send(clientSocket, result.c_str(), result.size(), 0) == SOCKET_ERROR
 
-                uint16_t networkBigEndian = htons(serverResult.length);
-                std::memcpy(sendBuffer, &networkBigEndian, 2);
-                std::memcpy(sendBuffer + 2, serverResult.result, serverResult.length);
+            // 4 bytes for length (32 bits value)
+            uint32_t networkBigEndian = htons(serverResult.length);
+            std::memcpy(sendBuffer, &networkBigEndian, 4);
+            int sendSize = min(BUFFER_SIZE, serverResult.length + 4);
+            std::memcpy(sendBuffer + 4, serverResult.result, sendSize);
 
-                int sendSize = sizeof(serverResult.length) + serverResult.length;
+            if(send(clientSocket, sendBuffer, sendSize, 0) == SOCKET_ERROR) {
+                std::cerr << "Error sending data to client.\n";
+                break;
+            }
+
+            for(int i = sendSize; i < serverResult.length + 4; i += BUFFER_SIZE) {
+                sendSize = min(serverResult.length - i, BUFFER_SIZE);
                 if(send(clientSocket, sendBuffer, sendSize, 0) == SOCKET_ERROR) {
                     std::cerr << "Error sending data to client.\n";
                     break;
                 }
             }
-        } while(serverResult.length > 1022);
-
+        }
     }
 
     closesocket(clientSocket);

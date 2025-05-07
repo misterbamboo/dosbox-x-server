@@ -1938,6 +1938,7 @@ for /d %%i in ("$(SolutionDir)\..\contrib\translations\*") do copy "%%i\*.lng" "
     <ClInclude Include="..\src\libs\xBRZ\xbrz.h" />
     <ClInclude Include="..\src\libs\xBRZ\xbrz_config.h" />
     <ClInclude Include="..\src\libs\xBRZ\xbrz_tools.h" />
+    <ClInclude Include="..\src\server\cmds\VgaReadCmd.h" />
     <ClInclude Include="config.h" />
   </ItemGroup>
   <ItemGroup>

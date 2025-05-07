@@ -2,7 +2,7 @@
 
 #pragma once
 struct ServerResult {
-    uint16_t length; // 2 bytes
+    uint32_t length; // 4 bytes
     char* result; // pointer to the result data
     // The total size of the struct is 1024 bytes
 

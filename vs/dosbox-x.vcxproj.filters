@@ -2655,6 +2655,9 @@
     <ClInclude Include="..\src\misc\include\savestates.h">
       <Filter>Includes</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\server\cmds\VgaReadCmd.h">
+      <Filter>Sources\server\cmds</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\winres.rc">
