@@ -1,5 +1,7 @@
 #include <string>
 #include "mouse.h"
+#include <CmdCallback.cpp>
+//#include <ints/mouse.cpp>
 #include <server\result\ServerResult.h>
 
 class MouseCmd {
@@ -11,7 +13,7 @@ public:
     static constexpr const double MAX_X = 640.0;
     static constexpr const double MAX_Y = 480.0;
 
-    static bool canHandle(std::string cmd, ServerResult* serverResult) {
+    static bool canHandle(std::string cmd) {
         if(cmd.rfind(MOUVE_MOVE_CMD, 0) == 0) {
             return true;
         }
@@ -24,24 +26,32 @@ public:
         return false;
     }
 
-    static void handle(std::string cmd, ServerResult* serverResult) {
+    static void handle(std::string cmd, ServerResult* serverResult, CmdCallback callback) {
         if(cmd.rfind(MOUVE_MOVE_CMD, 0) == 0) {
+            registerMouseCallback([callback, serverResult]() {
+                serverResult->setTrue();
+                callback(serverResult);
+            });
             handlerMouseMoveCmd(cmd);
-            serverResult->setTrue();
-            return;
         }
         else if(cmd.rfind(MOUVE_PRESS_CMD, 0) == 0) {
+            registerMouseCallback([callback, serverResult]() {
+                serverResult->setTrue();
+                callback(serverResult);
+            });
             handlerMousePressedCmd(cmd);
-            serverResult->setTrue();
-            return;
         }
         else if(cmd.rfind(MOUVE_RELEASE_CMD, 0) == 0) {
+            registerMouseCallback([callback, serverResult]() {
+                serverResult->setTrue();
+                callback(serverResult);
+            });
             handlerMouseReleasedCmd(cmd);
-            serverResult->setTrue();
-            return;
         }
-
-        serverResult->setFalse();
+        else {
+            serverResult->setFalse();
+            callback(serverResult);
+        }
     }
 
     static void handlerMouseMoveCmd(std::string cmd) {

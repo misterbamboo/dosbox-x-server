@@ -5,6 +5,7 @@
 #include <map>
 #include "hardware.h"
 #include <server\handler\serverCmdHandler.cpp>
+#include <windows.h>
 #include <server\result\ServerResult.h>
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -130,6 +131,33 @@ void handleClient(SOCKET clientSocket) {
 
     std::cout << "Client handler started.\n";
 
+    CmdCallback replyCallBack = [clientSocket](ServerResult* result) {
+        //OutputDebugString(("Returning command result : " + result + "\n").c_str());
+
+        if(result->length > 0) {
+            // 4 bytes for length (32 bits value)
+            char sendBuffer[BUFFER_SIZE];
+            uint32_t networkBigEndian = htonl(result->length);
+            std::memcpy(sendBuffer, &networkBigEndian, 4);
+
+            if(send(clientSocket, sendBuffer, 4, 0) == SOCKET_ERROR) {
+                std::cerr << "Error sending data to client.\n";
+                return;
+            }
+
+            int sendSize = min(BUFFER_SIZE, result->length);
+            std::memcpy(sendBuffer, result->result, sendSize);
+
+            for(int i = sendSize; i < result->length; i += BUFFER_SIZE) {
+                sendSize = min(result->length - i, BUFFER_SIZE);
+                if(send(clientSocket, sendBuffer, sendSize, 0) == SOCKET_ERROR) {
+                    std::cerr << "Error sending data to client.\n";
+                    break;
+                }
+            }
+        }
+    };
+
     // Client-server communication loop
     while(true) {
         // Receive data from the client
@@ -146,32 +174,7 @@ void handleClient(SOCKET clientSocket) {
         }
 
         serverResult.length = 0;
-        executeServerCmd(cmd, &serverResult);
-
-        if(serverResult.length > 0) {
-            //std::string sendResult = result + "\n";
-            //send(clientSocket, result.c_str(), result.size(), 0) == SOCKET_ERROR
-
-            // 4 bytes for length (32 bits value)
-            uint32_t networkBigEndian = htonl(serverResult.length);
-            std::memcpy(sendBuffer, &networkBigEndian, 4);
-
-            if(send(clientSocket, sendBuffer, 4, 0) == SOCKET_ERROR) {
-                std::cerr << "Error sending data to client.\n";
-                break;
-            }
-
-            int sendSize = min(BUFFER_SIZE, serverResult.length);
-            std::memcpy(sendBuffer, serverResult.result, sendSize);
-
-            for(int i = sendSize; i < serverResult.length; i += BUFFER_SIZE) {
-                sendSize = min(serverResult.length - i, BUFFER_SIZE);
-                if(send(clientSocket, sendBuffer, sendSize, 0) == SOCKET_ERROR) {
-                    std::cerr << "Error sending data to client.\n";
-                    break;
-                }
-            }
-        }
+        executeServerCmd(cmd, replyCallBack, &serverResult);
     }
 
     closesocket(clientSocket);

@@ -16,10 +16,10 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-
-
 #ifndef DOSBOX_MOUSE_H
 #define DOSBOX_MOUSE_H
+
+#include <functional>
 
 enum MOUSE_EMULATION
 {
@@ -28,6 +28,8 @@ enum MOUSE_EMULATION
     MOUSE_EMULATION_INTEGRATION,
     MOUSE_EMULATION_LOCKED,
 };
+
+typedef std::function<void()> MouseCallback;
 
 bool Mouse_SetPS2State(bool use);
 
@@ -51,5 +53,7 @@ void UpdateMouseReportRate(void);
 void ChangeMouseReportRate(unsigned int new_rate);
 
 void ServerMouse_SursorMoved(float x, float y, float xrel, float yrel);
+
+void registerMouseCallback(MouseCallback cb);
 
 #endif
