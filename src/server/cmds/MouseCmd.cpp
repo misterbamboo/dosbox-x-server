@@ -1,5 +1,7 @@
 #include <string>
 #include "mouse.h"
+#include <CmdCallback.cpp>
+//#include <ints/mouse.cpp>
 
 class MouseCmd {
 public:
@@ -23,18 +25,24 @@ public:
         return false;
     }
 
-    static std::string handle(std::string cmd) {
+    static void handle(std::string cmd, CmdCallback callback) {
         if(cmd.rfind(MOUVE_MOVE_CMD, 0) == 0) {
+            registerMouseCallback([callback]() {
+                callback("mouse_moved");
+            });
             handlerMouseMoveCmd(cmd);
-            return "mouse_moved";
         }
         else if(cmd.rfind(MOUVE_PRESS_CMD, 0) == 0) {
+            registerMouseCallback([callback]() {
+                callback("mouse_pressed");
+            });
             handlerMousePressedCmd(cmd);
-            return "mouse_pressed";
         }
         else if(cmd.rfind(MOUVE_RELEASE_CMD, 0) == 0) {
+            registerMouseCallback([callback]() {
+                callback("mouse_released");
+            });
             handlerMouseReleasedCmd(cmd);
-            return "mouse_released";
         }
     }
 

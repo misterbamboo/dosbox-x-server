@@ -3,24 +3,26 @@
 #include <server\cmds\MemoryReadCmd.cpp>
 #include <server\cmds\MouseCmd.cpp>
 #include <server\cmds\SaveStateCmd.cpp>
+#include <CmdCallback.cpp>
 
-static std::string executeServerCmd(std::string& cmd) {
+static void executeServerCmd(std::string& cmd, CmdCallback callback) {
     if(cmd.empty()) {
-        return "";
+        return;
     }
 
     if(CaptureCmd::canHandle(cmd)) {
-        return CaptureCmd::handle(cmd);
+        std::string value = CaptureCmd::handle(cmd);
+        callback(value);
     }
     else if(MemoryReadCmd::canHandle(cmd)) {
-        return MemoryReadCmd::handle(cmd);
+        std::string value = MemoryReadCmd::handle(cmd);
+        callback(value);
     }
     else if(MouseCmd::canHandle(cmd)) {
-        return MouseCmd::handle(cmd);
+        MouseCmd::handle(cmd, callback);
     }
     else if(SaveStateCmd::canHandle(cmd)) {
-        return SaveStateCmd::handle(cmd);
+        std::string value = SaveStateCmd::handle(cmd);
+        callback(value);
     }
-
-    return "";
 }

@@ -5,6 +5,7 @@
 #include <map>
 #include "hardware.h"
 #include <server\handler\serverCmdHandler.cpp>
+#include <windows.h>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -127,6 +128,17 @@ void handleClient(SOCKET clientSocket) {
 
     std::cout << "Client handler started.\n";
 
+    CmdCallback replyCallBack = [clientSocket](std::string result) {
+        OutputDebugString(("Returning command result : " + result + "\n").c_str());
+
+        if(!result.empty()) {
+            std::string sendResult = result + "\n";
+            if(send(clientSocket, result.c_str(), result.size(), 0) == SOCKET_ERROR) {
+                std::cerr << "Error sending data to client.\n";
+            }
+        }
+    };
+
     // Client-server communication loop
     while(true) {
         // Receive data from the client
@@ -142,14 +154,9 @@ void handleClient(SOCKET clientSocket) {
             break;
         }
 
-        std::string result = executeServerCmd(cmd);
-        if(!result.empty()) {
-            std::string sendResult = result + "\n";
-            if(send(clientSocket, result.c_str(), result.size(), 0) == SOCKET_ERROR) {
-                std::cerr << "Error sending data to client.\n";
-                break;
-            }
-        }
+        std::cout << cmd + "\n";
+        OutputDebugString(("received command : " + cmd + "\n").c_str());
+        executeServerCmd(cmd, replyCallBack);
     }
 
     closesocket(clientSocket);

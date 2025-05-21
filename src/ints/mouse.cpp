@@ -43,6 +43,10 @@
 #include "control.h"
 #include "SDL.h"
 
+#include <windows.h>
+#include <iostream>
+#include <functional>
+
 #if defined(_MSC_VER)
 # pragma warning(disable:4244) /* const fmath::local::uint64_t to double possible loss of data */
 #endif
@@ -110,6 +114,31 @@ static Bitu call_mouse_bd = 0;
 static Bitu call_int33 = 0;
 static Bitu call_int74 = 0;
 static Bitu call_ps2, call_uir = 0;
+
+
+// Define a function pointer type for the callback
+typedef std::function<void()> MouseCallback;
+
+// Declare a global callback variable
+MouseCallback globalMouseCallback = nullptr;
+
+// Function to register (set) the callback
+void registerMouseCallback(MouseCallback cb) {
+    globalMouseCallback = cb;
+}
+
+// Function that uses the callback
+void triggerMouseEvent() {
+    if(globalMouseCallback) {
+        globalMouseCallback();  // Call the registered callback
+
+        // Reset callback
+        globalMouseCallback = nullptr;
+    }
+    else {
+        std::cout << "No callback registered.\n";
+    }
+}
 
 void MOUSE_Unsetup_DOS(void) {
     if (call_mouse_bd != 0) {
@@ -459,6 +488,11 @@ INLINE void Mouse_AddEvent(uint8_t type) {
             for(Bitu i = mouse.events ; i ; i--)
                 mouse.event_queue[i] = mouse.event_queue[i-1];
         }
+
+        if(mouse.events > 2) {
+            OutputDebugString(("mouse.events count: " + std::to_string(mouse.events) + "\n").c_str());
+        }
+
         mouse.event_queue[0].type=type;
         mouse.event_queue[0].buttons=mouse.buttons;
         mouse.events++;
@@ -2228,6 +2262,9 @@ static Bitu INT74_Handler(void) {
             SegSet16(cs, RealSeg(CALLBACK_RealPointer(int74_ret_callback)));
             reg_ip = RealOff(CALLBACK_RealPointer(int74_ret_callback));
         }
+
+        OutputDebugString("mouse.events end!\n");
+        triggerMouseEvent();
     } else {
         SegSet16(cs, RealSeg(CALLBACK_RealPointer(int74_ret_callback)));
         reg_ip = RealOff(CALLBACK_RealPointer(int74_ret_callback));
