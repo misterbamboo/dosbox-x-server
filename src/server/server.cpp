@@ -50,6 +50,12 @@ void startServer(const char* port) {
     SOCKET listenSocket = INVALID_SOCKET;
     struct addrinfo* result = nullptr, hints;
 
+
+    OutputDebugString("Hello from Debug Output!\n");
+
+    std::cout << "testing log.\n";
+    std::cout.flush();
+
     // Initialize Winsock
     if(WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         std::cerr << "WSAStartup failed.\n";

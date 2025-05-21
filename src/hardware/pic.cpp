@@ -28,6 +28,8 @@
 #include "setup.h"
 #include "control.h"
 
+#include <windows.h>
+
 #if defined(_MSC_VER)
 # pragma warning(disable:4244) /* const fmath::local::uint64_t to double possible loss of data */
 #endif
@@ -621,14 +623,17 @@ void DEBUG_PICMask(int irq,bool mask) {
 }
 
 static void AddEntry(PICEntry * entry) {
+    //OutputDebugString("AddEntry\n");
     PICEntry * find_entry=pic_queue.next_entry;
     if (GCC_UNLIKELY(!find_entry)) {
         entry->next = nullptr;
         pic_queue.next_entry=entry;
     } else if (find_entry->index>entry->index) {
+        //OutputDebugString("AddEntry b\n");
         pic_queue.next_entry=entry;
         entry->next=find_entry;
     } else while (find_entry) {
+        //OutputDebugString("AddEntry c\n");
         if (find_entry->next) {
             /* See if the next index comes later than this one */
             if (find_entry->next->index > entry->index) {
@@ -682,12 +687,14 @@ void PIC_RemoveSpecificEvents(PIC_EventHandler handler, Bitu val) {
     while (entry) {
         if (GCC_UNLIKELY((entry->pic_event == handler)) && (entry->value == val)) {
             if (prev_entry) {
+                OutputDebugString("PIC_RemoveSpecificEvents a\n");
                 prev_entry->next=entry->next;
                 entry->next=pic_queue.free_entry;
                 pic_queue.free_entry=entry;
                 entry=prev_entry->next;
                 continue;
             } else {
+                OutputDebugString("PIC_RemoveSpecificEvents b\n");
                 pic_queue.next_entry=entry->next;
                 entry->next=pic_queue.free_entry;
                 pic_queue.free_entry=entry;
@@ -706,12 +713,14 @@ void PIC_RemoveEvents(PIC_EventHandler handler) {
     while (entry) {
         if (GCC_UNLIKELY(entry->pic_event==handler)) {
             if (prev_entry) {
+                OutputDebugString("PIC_RemoveEvents a\n");
                 prev_entry->next=entry->next;
                 entry->next=pic_queue.free_entry;
                 pic_queue.free_entry=entry;
                 entry=prev_entry->next;
                 continue;
             } else {
+                OutputDebugString("PIC_RemoveEvents b\n");
                 pic_queue.next_entry=entry->next;
                 entry->next=pic_queue.free_entry;
                 pic_queue.free_entry=entry;
@@ -762,6 +771,7 @@ bool PIC_RunQueue(void) {
         Bits index_nd=PIC_TickIndexND();
         InEventService = true;
         while (pic_queue.next_entry && (pic_queue.next_entry->index*CPU_CycleMax<=index_nd)) {
+            //OutputDebugString("PIC_RunQueue move to next_entry\n");
             PICEntry * entry=pic_queue.next_entry;
             pic_queue.next_entry=entry->next;
             srv_lag = entry->index;
@@ -870,9 +880,18 @@ void TIMER_AddTick(void) {
 
     /* Go through the list of scheduled events and lower their index with 1000 */
     PICEntry * entry=pic_queue.next_entry;
+    int count = 0;
     while (entry) {
         entry->index -= 1.0;
         entry=entry->next;
+
+        count++;
+        if(count > 100000) {
+            OutputDebugString("Reset pic_queue.next_entry\n");
+
+            pic_queue.next_entry = nullptr;
+            break;
+        }
     }
 
     /* Call our list of ticker handlers */

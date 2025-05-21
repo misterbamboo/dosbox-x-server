@@ -249,7 +249,6 @@ extern "C" void sdl1_hax_macosx_highdpi_set_enable(const bool enable);
 # endif
 #endif
 
-#include "sdlmain.h"
 #include "build_timestamp.h"
 #include "version_string.h"
 
@@ -1300,9 +1299,6 @@ void PushDummySDL(void) {
     event.type = SDL_KEYUP;
     SDL_PushEvent(&event);
 }
-
-static void HandleMouseMotion(SDL_MouseMotionEvent * motion);
-static void HandleMouseButton(SDL_MouseButtonEvent * button, SDL_MouseMotionEvent * motion);
 
 #if defined(C_SDL2)
 # if !defined(IGNORE_TOUCHSCREEN)
@@ -4257,7 +4253,7 @@ extern unsigned int mouse_notify_mode;
 
 bool user_cursor_locked = false;
 MOUSE_EMULATION user_cursor_emulation = MOUSE_EMULATION_NEVER;
-int user_cursor_x = 0,user_cursor_y = 0;
+extern int user_cursor_x = 0,user_cursor_y = 0;
 int user_cursor_sw = 640,user_cursor_sh = 480;
 
 #if DOSBOXMENU_TYPE == DOSBOXMENU_SDLDRAW /* SDL drawn menus */
@@ -4334,7 +4330,18 @@ bool GFX_CursorInOrNearScreen(int wx,int wy) {
     return  (wx >= minx && wx < maxx) && (wy >= miny && wy < maxy);
 }
 
-static void HandleMouseMotion(SDL_MouseMotionEvent * motion) {
+void HandleMouseMotion(SDL_MouseMotionEvent * motion) {
+
+    OutputDebugString(("SDL_MouseMotionEvent: type="
+        + std::to_string(motion->type)
+        + " which=" + std::to_string(motion->which)
+        + " state=" + std::to_string(motion->state)
+        + " coord=(" + std::to_string(motion->x)
+        + ", " + std::to_string(motion->y)
+        + ") rel=(" + std::to_string(motion->xrel)
+        + ", " + std::to_string(motion->yrel)
+        + "\n").c_str()
+    );
     bool inputToScreen = false;
 
     /* limit mouse input to whenever the cursor is on the screen, or near the edge of the screen. */
@@ -4533,7 +4540,27 @@ static void HandleMouseWheel(bool normal, int amount) {
     }
 }
 
-static void HandleMouseButton(SDL_MouseButtonEvent * button, SDL_MouseMotionEvent * motion) {
+void HandleMouseButton(SDL_MouseButtonEvent * button, SDL_MouseMotionEvent * motion) {
+    OutputDebugString(("SDL_MouseButtonEvent: type="
+        + std::to_string(button->type)
+        + " which=" + std::to_string(button->which)
+        + " button=" + std::to_string(button->button)
+        + " state=" + std::to_string(button->state)
+        + " coord=(" + std::to_string(button->x)
+        + ", " + std::to_string(button->y)
+        + ")\n").c_str()
+    );
+    OutputDebugString(("SDL_MouseMotionEvent: type="
+        + std::to_string(motion->type)
+        + " which=" + std::to_string(motion->which)
+        + " state=" + std::to_string(motion->state)
+        + " coord=(" + std::to_string(motion->x)
+        + ", " + std::to_string(motion->y)
+        + ") rel=(" + std::to_string(motion->xrel)
+        + ", " + std::to_string(motion->yrel)
+        + "\n").c_str()
+    );
+
 #if !defined(WIN32)
     (void)motion;
 #endif

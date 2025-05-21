@@ -250,3 +250,8 @@ BOOL CALLBACK EnumDispProc(HMONITOR hMon, HDC dcMon, RECT* pRcMon, LPARAM lParam
 #endif
 
 #endif /*DOSBOX_SDLMAIN_H*/
+
+
+extern int user_cursor_x, user_cursor_y;
+void HandleMouseMotion(SDL_MouseMotionEvent* motion);
+void HandleMouseButton(SDL_MouseButtonEvent* button, SDL_MouseMotionEvent* motion);

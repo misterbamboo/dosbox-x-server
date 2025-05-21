@@ -34,6 +34,8 @@
 // TODO: #ifdef FPU...
 #include "fpu.h"
 
+#include <windows.h>
+
 /* dynamic core, policy, method, and flags.
  * We're going to make dynamic core more flexible, AND make sure
  * that both dynx86 and dynrec are using common memory mapping
@@ -3441,10 +3443,12 @@ void CPU_Enable_SkipAutoAdjust(void) {
 		if (CPU_CycleMax < CPU_CYCLES_LOWER_LIMIT)
 			CPU_CycleMax = CPU_CYCLES_LOWER_LIMIT;
 	}
+    OutputDebugString("setting OutputDebugString = True!\n");
 	CPU_SkipCycleAutoAdjust=true;
 }
 
 void CPU_Disable_SkipAutoAdjust(void) {
+    OutputDebugString("setting OutputDebugString = False!\n");
 	CPU_SkipCycleAutoAdjust=false;
 }
 

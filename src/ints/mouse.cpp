@@ -478,6 +478,7 @@ void MOUSE_Limit_Events(Bitu /*val*/) {
 }
 
 INLINE void Mouse_AddEvent(uint8_t type) {
+    
     if (mouse.events<QUEUE_SIZE) {
         if (mouse.events>0) {
             /* Skip duplicate events */

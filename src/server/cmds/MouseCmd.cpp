@@ -1,7 +1,11 @@
 #include <string>
-#include "mouse.h"
+//#include "mouse.h"
+#include "sdlmain.h"
 #include <CmdCallback.cpp>
 //#include <ints/mouse.cpp>
+//#include <gui/sdlmain.cpp>
+
+extern int user_cursor_x, user_cursor_y;
 
 class MouseCmd {
 public:
@@ -53,20 +57,82 @@ public:
         double x = std::stoi(xStr);
         double y = std::stoi(yStr);
 
-        double xRatio = x / MAX_X;
-        double yRatio = y / MAX_Y;
-        ServerMouse_SursorMoved(x, y, xRatio, yRatio);
+        // type=4 which=0 state=0 coord=(586, 377) rel=(-9, -17)
+
+        SDL_MouseMotionEvent motion;
+        motion.type = 4;
+        motion.which = 0;
+        motion.state = 0;
+        motion.x = x;
+        motion.y = y;
+        motion.xrel = user_cursor_x - x;
+        motion.yrel = user_cursor_y - y;
+
+        HandleMouseMotion(&motion);
+
+        /*double xRatio = x / MAX_X;
+        double yRatio = y / MAX_Y;*/
+        //ServerMouse_SursorMoved(xRatio, yRatio, x, y);
     }
 
     static void handlerMousePressedCmd(std::string cmd) {
-        std::string button = cmd.substr(std::string(MOUVE_PRESS_CMD).size());
-        int buttonNum = std::stoi(button);
-        Mouse_ButtonPressed(buttonNum); // 0: Left, 1: Right, 2: Middle
+        std::string buttonStr = cmd.substr(std::string(MOUVE_PRESS_CMD).size());
+        int buttonNum = std::stoi(buttonStr);
+
+        /*
+        SDL_MouseButtonEvent: type=5 which=0 button=1 state=1 coord=(592, 386)
+        SDL_MouseMotionEvent: type=5 which=0 state=1 coord=(592, 386) rel=(0, 0)
+        mouse.events end!
+        SDL_MouseButtonEvent: type=6 which=0 button=1 state=0 coord=(592, 386)
+        SDL_MouseMotionEvent: type=6 which=0 state=1 coord=(592, 386) rel=(0, 0)
+        */
+
+        SDL_MouseButtonEvent button;
+        button.type = SDL_MOUSEBUTTONDOWN;
+        button.which = 0;
+        button.button = 1; // 0: Left, 1: Right, 2: Middle
+        button.state = SDL_PRESSED;
+        button.x = user_cursor_x;
+        button.y = user_cursor_y;
+
+        SDL_MouseMotionEvent motion;
+        motion.type = SDL_MOUSEBUTTONDOWN;
+        motion.which = 0;
+        motion.state = 1;
+        motion.x = user_cursor_x;
+        motion.y = user_cursor_y;
+        motion.xrel = 0;
+        motion.yrel = 0;
+
+
+        HandleMouseButton(&button, &motion);
+
+        // Mouse_ButtonPressed(buttonNum); // 0: Left, 1: Right, 2: Middle
     }
 
     static void handlerMouseReleasedCmd(std::string cmd) {
-        std::string button = cmd.substr(std::string(MOUVE_RELEASE_CMD).size());
-        int buttonNum = std::stoi(button);
-        Mouse_ButtonReleased(buttonNum); // 0: Left, 1: Right, 2: Middle
+        std::string buttonStr = cmd.substr(std::string(MOUVE_RELEASE_CMD).size());
+        int buttonNum = std::stoi(buttonStr);
+
+        SDL_MouseButtonEvent button;
+        button.type = SDL_MOUSEBUTTONUP;
+        button.which = 0;
+        button.button = 1; // 0: Left, 1: Right, 2: Middle
+        button.state = SDL_RELEASED;
+        button.x = user_cursor_x;
+        button.y = user_cursor_y;
+
+        SDL_MouseMotionEvent motion;
+        motion.type = SDL_MOUSEBUTTONUP;
+        motion.which = 0;
+        motion.state = 1;
+        motion.x = user_cursor_x;
+        motion.y = user_cursor_y;
+        motion.xrel = 0;
+        motion.yrel = 0;
+
+        HandleMouseButton(&button, &motion);
+
+        //Mouse_ButtonReleased(buttonNum); // 0: Left, 1: Right, 2: Middle
     }
 };
