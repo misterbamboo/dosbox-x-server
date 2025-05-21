@@ -24,9 +24,9 @@ void VgaReadCmd::handle(std::string cmd, ServerResult* serverResult) {
 void VgaReadCmd::dumpVgaMem(ServerResult* serverResult) {
     uint8_t* framebuffer = &vga.mem.linear[0];
 
-    for(int y = 0; y < HEIGHT; ++y) {
-        for(int x = 0; x < WIDTH; ++x) {
-            uint8_t color_index = framebuffer[y * WIDTH + x];
+    for(int y = 0; y < HEIGHT; y++) {
+        for(int x = 0; x < WIDTH; x++) {
+            uint8_t color_index = framebuffer[y * WIDTH + x] + 0x04000u; // graphics offset
             RGBEntry color = vga.dac.rgb[color_index];
 
             // Scale 6-bit DAC (0–63) to 8-bit RGB (0–255)

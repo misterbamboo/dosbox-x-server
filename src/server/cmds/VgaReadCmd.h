@@ -9,8 +9,8 @@ class VgaReadCmd {
 public:
     static constexpr const char* VGA_READ_CMD = "vga_read,";
 
-    static constexpr int WIDTH = 640;
-    static constexpr int HEIGHT = 480;
+    static constexpr int WIDTH = 320;
+    static constexpr int HEIGHT = 200;
     static constexpr int COLORS = 3; // RGB
 
     static uint8_t image_output[WIDTH * HEIGHT * COLORS];  // Storage allocation

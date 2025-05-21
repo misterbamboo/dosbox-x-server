@@ -153,17 +153,18 @@ void handleClient(SOCKET clientSocket) {
             //send(clientSocket, result.c_str(), result.size(), 0) == SOCKET_ERROR
 
             // 4 bytes for length (32 bits value)
-            uint32_t networkBigEndian = htons(serverResult.length);
+            uint32_t networkBigEndian = htonl(serverResult.length);
             std::memcpy(sendBuffer, &networkBigEndian, 4);
-            int sendSize = min(BUFFER_SIZE, serverResult.length + 4);
-            std::memcpy(sendBuffer + 4, serverResult.result, sendSize);
 
-            if(send(clientSocket, sendBuffer, sendSize, 0) == SOCKET_ERROR) {
+            if(send(clientSocket, sendBuffer, 4, 0) == SOCKET_ERROR) {
                 std::cerr << "Error sending data to client.\n";
                 break;
             }
 
-            for(int i = sendSize; i < serverResult.length + 4; i += BUFFER_SIZE) {
+            int sendSize = min(BUFFER_SIZE, serverResult.length);
+            std::memcpy(sendBuffer, serverResult.result, sendSize);
+
+            for(int i = sendSize; i < serverResult.length; i += BUFFER_SIZE) {
                 sendSize = min(serverResult.length - i, BUFFER_SIZE);
                 if(send(clientSocket, sendBuffer, sendSize, 0) == SOCKET_ERROR) {
                     std::cerr << "Error sending data to client.\n";
