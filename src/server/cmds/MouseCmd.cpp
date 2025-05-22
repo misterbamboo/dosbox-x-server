@@ -2,6 +2,8 @@
 //#include "mouse.h"
 #include "sdlmain.h"
 #include <CmdCallback.cpp>
+#include <PathGenerator.cpp>
+//#include <server\cmds\PathGenerator.cpp>
 //#include <ints/mouse.cpp>
 //#include <gui/sdlmain.cpp>
 
@@ -31,10 +33,7 @@ public:
 
     static void handle(std::string cmd, CmdCallback callback) {
         if(cmd.rfind(MOUVE_MOVE_CMD, 0) == 0) {
-            registerMouseCallback([callback]() {
-                callback("mouse_moved");
-            });
-            handlerMouseMoveCmd(cmd);
+            handlerMouseMoveCmd(cmd, callback);
         }
         else if(cmd.rfind(MOUVE_PRESS_CMD, 0) == 0) {
             registerMouseCallback([callback]() {
@@ -50,25 +49,42 @@ public:
         }
     }
 
-    static void handlerMouseMoveCmd(std::string cmd) {
+    static void handlerMouseMoveCmd(std::string cmd, CmdCallback callback) {
         std::string xAndYstr = cmd.substr(std::string(MOUVE_MOVE_CMD).size());
         std::string xStr = xAndYstr.substr(0, xAndYstr.find(","));
         std::string yStr = xAndYstr.substr(xAndYstr.find(",") + 1);
         double x = std::stoi(xStr);
         double y = std::stoi(yStr);
 
-        // type=4 which=0 state=0 coord=(586, 377) rel=(-9, -17)
 
-        SDL_MouseMotionEvent motion;
-        motion.type = 4;
-        motion.which = 0;
-        motion.state = 0;
-        motion.x = x;
-        motion.y = y;
-        motion.xrel = user_cursor_x - x;
-        motion.yrel = user_cursor_y - y;
+        // todo: trigger the server call back only when all mouse event are processed
+        registerMouseCallback([callback]() {
+            callback("mouse_moved");
+        });
 
-        HandleMouseMotion(&motion);
+        std::vector<std::pair<double, double>> paths = PathGenerator::generateHumanLikePath(
+            user_cursor_x, user_cursor_y, x, y);
+
+        double last_x = user_cursor_x;
+        double last_y = user_cursor_y;
+        // Output the generated path
+        for(const auto& point : paths) {
+
+            // type=4 which=0 state=0 coord=(586, 377) rel=(-9, -17)
+            SDL_MouseMotionEvent motion;
+            motion.type = 4;
+            motion.which = 0;
+            motion.state = 0;
+            motion.x = point.first;
+            motion.y = point.second;
+            motion.xrel = last_x - point.first;
+            motion.yrel = last_y - point.second;
+
+            HandleMouseMotion(&motion);
+
+            last_x = point.first;
+            last_y = point.second;
+        }
 
         /*double xRatio = x / MAX_X;
         double yRatio = y / MAX_Y;*/

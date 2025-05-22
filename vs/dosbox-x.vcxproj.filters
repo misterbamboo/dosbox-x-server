@@ -1689,6 +1689,9 @@
     <ClCompile Include="CmdCallback.cpp">
       <Filter>Sources\server\cmds</Filter>
     </ClCompile>
+    <ClCompile Include="PathGenerator.cpp">
+      <Filter>Sources\server\cmds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\aviwriter\avi.h">
